@@ -236,10 +236,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
             </div>
             <div class="divider" style="margin: 20px 0;"></div>
             <h3 class="h3" style="margin-bottom: 14px; font-size: 20px;">Recent Bridges</h3>
-            <div style="display: flex; flex-direction: column; gap: 8px; color: var(--muted); font-size: 14px;">
-              <div>Sepolia → Amoy · 1.5 ETH · ✓ Confirmed</div>
-              <div>BSC → Arc · 250 BNB · ⟳ Pending</div>
-            </div>
+            <div id="recent-bridges" style="display: flex; flex-direction: column; gap: 8px; color: var(--muted); font-size: 14px;"></div>
           </div>
         </div>
       </div>
@@ -305,13 +302,8 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;"><span style="font-size: 14px; font-weight: 600;">Auto Lock Liquidity</span><div id="autolock-toggle" class="toggle active" onclick="this.classList.toggle('active')"></div></div>
           <div class="glass" style="padding: 28px;">
             <h3 class="h3" style="margin-bottom: 18px; font-size: 20px;">Deployment Fee by Network</h3>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div class="coin-row" style="justify-content: space-between;"><div><div style="font-weight: 700; font-size: 15px;">Ethereum Sepolia</div><div style="color: var(--muted); font-size: 13px;">ETH based</div></div><div style="text-align: right;"><div style="font-weight: 800; font-size: 16px;">0.005 ETH</div><div style="color: var(--muted); font-size: 12px;" id="fee-sepolia">~$17.4</div></div></div>
-              <div class="coin-row" style="justify-content: space-between;"><div><div style="font-weight: 700; font-size: 15px;">Polygon Amoy</div><div style="color: var(--muted); font-size: 13px;">MATIC based</div></div><div style="text-align: right;"><div style="font-weight: 800; font-size: 16px;" id="fee-matic">~$0.89</div><div style="color: var(--muted); font-size: 12px;">≈0.001 ETH</div></div></div>
-              <div class="coin-row" style="justify-content: space-between;"><div><div style="font-weight: 700; font-size: 15px;">BSC Testnet</div><div style="color: var(--muted); font-size: 13px;">BNB based</div></div><div style="text-align: right;"><div style="font-weight: 800; font-size: 16px;" id="fee-bnb">~$0.61</div><div style="color: var(--muted); font-size: 12px;">≈0.001 ETH</div></div></div>
-              <div class="coin-row" style="justify-content: space-between;"><div><div style="font-weight: 700; font-size: 15px;">Arc Testnet</div><div style="color: var(--muted); font-size: 13px;">ARC based</div></div><div style="text-align: right;"><div style="font-weight: 800; font-size: 16px;" id="fee-arc">~$2.10</div><div style="color: var(--muted); font-size: 12px;">≈0.001 ETH</div></div></div>
-            </div>
-            <div style="margin-top: 14px; font-size: 12px; color: var(--muted);">Fees are dynamic based on current market price and may vary on live networks.</div>
+            <div id="fee-feed" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <div style="margin-top: 14px; font-size: 12px; color: var(--muted);">Target: approx. $5 USD equivalent per network using that network's gas token.</div>
           </div>
             <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="launchMeme()">Launch Meme Coin</button>
           </div>
@@ -319,9 +311,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
             <div class="glass" style="padding: 28px; margin-bottom: 20px;">
               <h3 class="h3" style="margin-bottom: 18px; font-size: 20px;">Trending Memes</h3>
               <div id="meme-feed">
-                <div class="coin-row" style="justify-content: space-between;"><div><div style="font-weight: 700; font-size: 15px;">RavenDoge</div><div style="color: var(--muted); font-size: 13px;">Launched 2h ago · +340%</div></div><div style="text-align: right;"><div style="font-weight: 800; font-size: 16px;">$0.0042</div><div style="color: #16a34a; font-size: 11px; font-weight: 700;">MC $840K</div></div></div>
-                <div class="coin-row" style="justify-content: space-between;"><div><div style="font-weight: 700; font-size: 15px;">PepeRaven</div><div style="color: var(--muted); font-size: 13px;">Launched 5h ago · +120%</div></div><div style="text-align: right;"><div style="font-weight: 800; font-size: 16px;">$0.00089</div><div style="color: #16a34a; font-size: 11px; font-weight: 700;">MC $220K</div></div></div>
-                <div class="coin-row" style="justify-content: space-between;"><div><div style="font-weight: 700; font-size: 15px;">MoonRaven</div><div style="color: var(--muted); font-size: 13px;">Launched 1d ago · +56%</div></div><div style="text-align: right;"><div style="font-weight: 800; font-size: 16px;">$0.0012</div><div style="color: #16a34a; font-size: 11px; font-weight: 700;">MC $180K</div></div></div>
+                <div style="text-align: center; padding: 24px 0; color: var(--muted); font-size: 13px;">No trending tokens yet.</div>
               </div>
             </div>
             <div class="glass" style="padding: 28px;">
