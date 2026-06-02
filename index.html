@@ -181,7 +181,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
               <div class="metric"><span style="color: var(--muted);">Network Fee</span><span id="network-fee" style="font-weight: 700;">~$2.40</span></div>
               <div class="metric"><span style="color: var(--muted);">Slippage</span><span style="font-weight: 700; color: #16a34a;">0.5%</span></div>
             </div>
-            <button class="btn-primary" style="width: 100%; justify-content: center;">Execute Swap</button>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="requireWallet(() => executeSwap())">Execute Swap</button>
           </div>
           <div>
             <div class="glass" style="padding: 28px; margin-bottom: 20px;">
@@ -224,7 +224,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
               <div class="metric"><span style="color: var(--muted);">Bridge Fee</span><span style="font-weight: 700;">0.1%</span></div>
               <div class="metric"><span style="color: var(--muted);">Route</span><span id="bridge-route" style="font-weight: 700;">ETH via Sepolia → Amoy</span></div>
             </div>
-            <button class="btn-primary" style="width: 100%; justify-content: center;">Bridge Tokens</button>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="requireWallet(() => executeBridge())">Bridge Tokens</button>
           </div>
           <div class="glass" style="padding: 32px;">
             <h3 class="h3" style="margin-bottom: 20px; font-size: 20px;">Network Explorer</h3>
@@ -305,7 +305,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
             <div id="fee-feed" style="display: flex; flex-direction: column; gap: 10px;"></div>
             <div style="margin-top: 14px; font-size: 12px; color: var(--muted);">Target: approx. $5 USD equivalent per network using that network's gas token.</div>
           </div>
-            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="launchMeme()">Launch Meme Coin</button>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="requireWallet(() => launchMeme())">Launch Meme Coin</button>
           </div>
           <div>
             <div class="glass" style="padding: 28px; margin-bottom: 20px;">
@@ -531,6 +531,29 @@ function updateBridgeRoute() {
   if (el) el.addEventListener('change', updateBridgeRoute);
 });
 updateBridgeRoute();
+
+function requireWallet(fn) {
+  const raw = localStorage.getItem('raven-wallet');
+  if (!raw) {
+    openWalletModal();
+    return;
+  }
+  try {
+    JSON.parse(raw);
+  } catch (e) {
+    openWalletModal();
+    return;
+  }
+  fn();
+}
+
+function executeSwap() {
+  alert('Testnet swap initiated. This is a UI demo — no real transaction sent.');
+}
+
+function executeBridge() {
+  alert('Testnet bridge initiated. This is a UI demo — no real transaction sent.');
+}
 
 function launchMeme() {
   const name = document.getElementById('meme-name').value;
