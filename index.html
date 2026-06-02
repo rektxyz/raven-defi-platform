@@ -266,7 +266,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
             <input class="input" placeholder="0.0" style="margin-bottom: 12px;">
             <label style="font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.14em; display: block; margin-bottom: 8px; text-transform: uppercase;">Token B</label>
             <input class="input" placeholder="0.0" style="margin-bottom: 18px;">
-            <button class="btn-primary" style="width: 100%; justify-content: center;">Supply Liquidity</button>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="requireWallet(() => supplyLiquidity())">Supply Liquidity</button>
           </div>
           <div class="glass" style="padding: 28px;">
             <h3 class="h3" style="margin-bottom: 20px; font-size: 20px;">Your Positions</h3>
@@ -274,7 +274,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
             <div class="divider"></div>
             <h3 class="h3" style="margin-bottom: 12px; font-size: 20px;">Remove Liquidity</h3>
             <input class="input" placeholder="LP amount" style="margin-bottom: 12px;">
-            <button class="btn-ghost" style="width: 100%; justify-content: center;">Withdraw</button>
+            <button class="btn-ghost" style="width: 100%; justify-content: center;" onclick="requireWallet(() => withdrawLiquidity())">Withdraw</button>
           </div>
         </div>
       </div>
@@ -553,6 +553,14 @@ function executeSwap() {
 
 function executeBridge() {
   alert('Testnet bridge initiated. This is a UI demo — no real transaction sent.');
+}
+
+function supplyLiquidity() {
+  alert('Testnet liquidity supply initiated. This is a UI demo — no real transaction sent.');
+}
+
+function withdrawLiquidity() {
+  alert('Testnet liquidity withdraw initiated. This is a UI demo — no real transaction sent.');
 }
 
 function launchMeme() {
