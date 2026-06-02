@@ -741,11 +741,11 @@ async function connectWallet(id, name) {
   try {
     let address = '';
     if (id === 'walletconnect') {
-      status.innerText = 'WalletConnect QR coming soon — use MetaMask / Rabby instead.';
+      status.innerText = 'WalletConnect coming soon — use MetaMask / Rabby / Trust / OKX for now.';
       status.style.color = 'var(--muted)';
       return;
     }
-    if (id === 'metamask' || id === 'rabby' || id === 'coinbase' || id === 'phantom' || id === 'trust' || id === 'ledger' || id === 'okx') {
+    if (id === 'metamask' || id === 'rabby' || id === 'coinbase' || id === 'phantom' || id === 'trust' || id === 'ledger' || id === 'okx' || id === 'walletconnect') {
       if (!window.ethereum) {
         status.innerText = 'No injected wallet found. Please install ' + name + '.';
         status.style.color = 'var(--accent)';
