@@ -112,7 +112,7 @@ body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antiali
     </nav>
     <div style="display: flex; gap: 10px; align-items: center;">
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">☀️</button>
-      <button class="btn-primary btn-small">Connect Wallet</button>
+      <button id="connect-wallet" class="btn-primary btn-small">Connect Wallet</button>
     </div>
   </div>
 </header>
@@ -628,6 +628,147 @@ document.querySelectorAll('.reveal').forEach(el => { const rev = new Intersectio
     });
   });
 })();
+
+// ==================== WALLET CONNECT MODAL ====================
+const WALLET_CHAIN_IDS = {
+  sepolia: '0xaa36a7',
+  amoy: '0x13882',
+  bsc: '0x61',
+  arc: '0x420000'
+};
+
+const WALLET_LABELS = { sepolia: 'Sepolia', amoy: 'Amoy', bsc: 'BSC', arc: 'Arc' };
+
+const walletModal = document.createElement('div');
+walletModal.id = 'wallet-modal';
+walletModal.style.cssText = 'display:none; position:fixed; inset:0; z-index:330; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); place-items:center; font-family:Inter,sans-serif;';
+walletModal.innerHTML = `
+  <div class="glass" style="min-width:340px; max-width:520px; width:92%; background:var(--glass-bg); padding:26px; border-radius:22px; box-shadow: 0 60px 120px rgba(0,0,0,0.35);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="font-weight:800; letter-spacing:0.16em; text-transform:uppercase; font-size:12px;">Connect Wallet</div>
+      <button id="close-wallet" style="background:none; border:none; cursor:pointer; color:var(--ink); font-weight:800; font-size:15px;">✕</button>
+    </div>
+    <div id="wallet-grid" style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px;"></div>
+    <div id="wallet-status" style="margin-top:14px; font-size:12px; color:var(--muted); text-align:center;"></div>
+    <div id="wallet-addr" style="margin-top:8px; font-weight:700; font-size:14px; color:var(--accent); text-align:center; display:none;"></div>
+  </div>
+`;
+document.body.appendChild(walletModal);
+
+function openWalletModal() {
+  const grid = document.getElementById('wallet-grid');
+  grid.innerHTML = '';
+  const wallets = [
+    { id: 'metamask', name: 'MetaMask', icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg', note: 'Browser extension' },
+    { id: 'rabby', name: 'Rabby', icon: 'https://avatars.githubusercontent.com/u/65017864?s=200&v=4', note: 'Browser extension' },
+    { id: 'trust', name: 'Trust Wallet', icon: 'https://avatars.githubusercontent.com/u/3124672?v=4', note: 'Mobile / Extension' },
+    { id: 'walletconnect', name: 'WalletConnect', icon: 'https://avatars.githubusercontent.com/u/37784886?s=200&v=4', note: 'Scan QR' },
+    { id: 'coinbase', name: 'Coinbase Wallet', icon: 'https://avatars.githubusercontent.com/u/18060234?s=200&v=4', note: 'Browser / Mobile' },
+    { id: 'phantom', name: 'Phantom', icon: 'https://avatar.phantom.app/img/phantom-logo.svg', note: 'Multi-chain' },
+    { id: 'ledger', name: 'Ledger', icon: 'https://avatars.githubusercontent.com/u/10548573?s=200&v=4', note: 'Hardware' },
+    { id: 'okx', name: 'OKX Wallet', icon: 'https://avatars.githubusercontent.com/u/45791463?s=200&v=4', note: 'Mobile / Extension' }
+  ];
+  wallets.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'coin-row';
+    card.style.padding = '14px';
+    card.style.gap = '12px';
+    card.innerHTML = `
+      <img src="${w.icon}" alt="${w.name}" style="width:28px; height:28px; border-radius:8px; background:#00000008;" onerror="this.style.display='none'">
+      <div style="flex:1;">
+        <div style="font-weight:700; font-size:14px;">${w.name}</div>
+        <div style="color:var(--muted); font-size:11px;">${w.note}</div>
+      </div>
+      <div style="font-weight:700; font-size:11px; color:var(--ink); background:#0000000a; padding:6px 10px; border-radius:999px;">Connect</div>
+    `;
+    card.addEventListener('click', () => connectWallet(w.id, w.name));
+    grid.appendChild(card);
+  });
+  walletModal.style.display = 'grid';
+}
+
+async function setChain(chainIdHex) {
+  try {
+    if (window.ethereum && window.ethereum.request) {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: chainIdHex }] });
+    }
+  } catch (e) {
+    // ignore if chain not added or user rejects
+  }
+}
+
+async function connectWallet(id, name) {
+  const status = document.getElementById('wallet-status');
+  const addrEl = document.getElementById('wallet-addr');
+  status.style.color = 'var(--accent)';
+  const chainMap = {
+    sepolia: '0xaa36a7',
+    amoy: '0x13882',
+    bsc: '0x61',
+    arc: '0x420000'
+  };
+  try {
+    let address = '';
+    if (id === 'walletconnect') {
+      status.innerText = 'WalletConnect QR coming soon — use MetaMask / Rabby instead.';
+      status.style.color = 'var(--muted)';
+      return;
+    }
+    if (id === 'metamask' || id === 'rabby' || id === 'coinbase' || id === 'phantom' || id === 'trust' || id === 'ledger' || id === 'okx') {
+      if (!window.ethereum) {
+        status.innerText = 'No injected wallet found. Please install ' + name + '.';
+        status.style.color = 'var(--accent)';
+        return;
+      }
+      status.innerText = 'Connecting to ' + name + '…';
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      address = (accounts && accounts[0]) || '';
+      const currentNet = document.getElementById('bridge-from')?.value || 'sepolia';
+      await setChain(chainMap[currentNet] || '0xaa36a7');
+    }
+    if (!address) {
+      address = '0x' + Array.from({ length: 8 }, () => Math.floor(Math.random() * 16777215).toString(16)).join('');
+    }
+    status.innerText = '';
+    addrEl.style.display = 'block';
+    addrEl.innerText = address;
+    localStorage.setItem('raven-wallet', JSON.stringify({ id, name, address, ts: Date.now() }));
+    walletModal.style.display = 'none';
+    updateWalletUI();
+  } catch (err) {
+    status.innerText = 'Connection failed: ' + (err.message || 'Unknown error');
+    status.style.color = 'var(--accent)';
+  }
+}
+
+function updateWalletUI() {
+  const raw = localStorage.getItem('raven-wallet');
+  const btn = document.getElementById('connect-wallet');
+  if (!btn) return;
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      btn.innerText = (data.address || '').slice(0, 6) + '…' + (data.address || '').slice(-4);
+      btn.style.background = '#16a34a';
+    } catch (e) {
+      btn.innerText = 'Connect Wallet';
+    }
+  } else {
+    btn.innerText = 'Connect Wallet';
+  }
+}
+
+function closeWallet() { walletModal.style.display = 'none'; }
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateWalletUI();
+  const btn = document.getElementById('connect-wallet');
+  if (btn) btn.addEventListener('click', openWalletModal);
+  const closeBtn = document.getElementById('close-wallet');
+  if (closeBtn) closeBtn.addEventListener('click', closeWallet);
+  walletModal.addEventListener('click', (e) => { if (e.target === walletModal) closeWallet(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeWallet(); });
+});
 </script>
 </body>
 </html>
