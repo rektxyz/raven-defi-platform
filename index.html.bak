@@ -653,15 +653,11 @@ document.querySelectorAll('.reveal').forEach(el => { const rev = new Intersectio
     opt.addEventListener('click', () => {
       const net = opt.getAttribute('data-network');
       document.getElementById('bridge-from').value = net;
-      document.getElementById('bridge-to').value = net; // switch both sides for convenience
       updateBridgeRoute();
-      window.localStorage.setItem('raven-network', net);
       close();
       window.scrollTo({ top: document.getElementById('bridge').offsetTop - 90, behavior: 'smooth' });
     });
   });
-  // reflect default
-  window.localStorage.getItem('raven-network') || 'sepolia';
 })();
 
 // ==================== WALLET CONNECT MODAL ====================
@@ -745,11 +741,11 @@ async function connectWallet(id, name) {
   try {
     let address = '';
     if (id === 'walletconnect') {
-      status.innerText = 'WalletConnect coming soon — use MetaMask / Rabby / Trust / OKX for now.';
+      status.innerText = 'WalletConnect QR coming soon — use MetaMask / Rabby instead.';
       status.style.color = 'var(--muted)';
       return;
     }
-    if (id === 'metamask' || id === 'rabby' || id === 'coinbase' || id === 'phantom' || id === 'trust' || id === 'ledger' || id === 'okx' || id === 'walletconnect') {
+    if (id === 'metamask' || id === 'rabby' || id === 'coinbase' || id === 'phantom' || id === 'trust' || id === 'ledger' || id === 'okx') {
       if (!window.ethereum) {
         status.innerText = 'No injected wallet found. Please install ' + name + '.';
         status.style.color = 'var(--accent)';

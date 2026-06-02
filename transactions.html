@@ -170,6 +170,41 @@ setInterval(() => {
   if (TXNS[activeNet].length > 20) TXNS[activeNet].shift();
   renderTxns(activeNet);
 }, 4000);
+
+<script>
+const feed = document.getElementById('txn-feed');
+const tabs = document.querySelectorAll('.tab');
+let activeNet = 'bsc';
+
+function renderTxns(net, filter) {
+  const list = (typeof TXNS !== 'undefined' && TXNS[net]) ? TXNS[net] : [];
+  feed.innerHTML = '';
+  const q = (filter || '').toLowerCase();
+  const rows = q ? list.filter(t => (t.hash+t.from+t.to+t.token).toLowerCase().includes(q)) : list;
+  rows.forEach(t => {
+    const isOk = t.status === 'confirmed';
+    const row = document.createElement('div');
+    row.className = 'txn-row';
+    row.innerHTML = `
+      <div>
+        <div style="font-weight:700; font-size:14px; overflow:hidden; text-overflow:ellipsis;">${t.hash}</div>
+        <div style="color:var(--muted); font-size:11px;">${t.age}</div>
+      </div>
+      <div style="font-size:13px; color:var(--muted); overflow:hidden; text-overflow:ellipsis;">${t.from} → ${t.to}</div>
+      <div style="font-weight:800; font-size:14px; text-align:center;">${t.value} ${t.token}</div>
+      <div class="hide-mobile"><span class="badge ${isOk?'badge-confirmed':'badge-pending'}" style="background:${isOk?'#16a34a14':'#f59e0b14'}; color:${isOk?'#16a34a':'#b45309'}; border:1px solid ${isOk?'#16a34a55':'#f59e0b55'}"><span class="pulse-dot" style="color:inherit"></span>${t.status}</span></div>
+      <div style="text-align:right;"><a href="${t.explorer}" target="_blank" rel="noopener" style="color:var(--accent); font-weight:700; font-size:12px; text-decoration:none;">Explorer ↗</a></div>
+    `;
+    feed.appendChild(row);
+  });
+}
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  activeNet = t.getAttribute('data-net');
+  renderTxns(activeNet, document.getElementById('txn-search').value);
+}));
+document.getElementById('txn-search').addEventListener('input', e => renderTxns(activeNet, e.target.value));
+renderTxns(activeNet);
 </script>
-</body>
-</html>
+
